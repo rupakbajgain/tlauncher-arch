@@ -11,6 +11,25 @@ info_msg() {
 info_msg "Installing Packages ..."
 sudo pacman -Sy --noconfirm --needed wget git unzip jre-openjdk
 
+cleanup() {
+    info_msg "Cleaning up previous tlauncher-arch installation ..."
+    [[ -d "$HOME/tlauncher-arch" ]] && rm -rf "$HOME/tlauncher-arch"
+    [[ -d "/usr/share/tlauncher" ]] && sudo rm -rf /usr/share/tlauncher
+    [[ -f "/usr/bin/tlauncher" ]] && sudo rm -f /usr/bin/tlauncher
+    [[ -f "/usr/share/icons/tlauncher.png" ]] && sudo rm -f /usr/share/icons/tlauncher.png
+    [[ -f "/usr/share/applications/tlauncher.desktop" ]] && sudo rm -f /usr/share/applications/tlauncher.desktop
+}
+
+# If previous clone exists, ask user whether to cleanup
+if [[ -d "$HOME/tlauncher-arch" ]]; then
+    read -p "If your previous attempt had failed in middle, you can retry with cleanup. Do you want to cleanup? (y/N): " do_cleanup
+    if [[ "$do_cleanup" =~ ^[Yy]$ ]]; then
+        cleanup
+    else
+        info_msg "Skipping cleanup."
+    fi
+fi
+
 info_msg "Cloning Repo ..."
 git clone https://github.com/mttomaz/tlauncher-arch.git "$HOME/tlauncher-arch"
 cd "$HOME/tlauncher-arch" || exit
